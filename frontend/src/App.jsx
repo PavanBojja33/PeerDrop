@@ -1,8 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
+import.meta.env
 
-const socket = io(process.env.backend);
+
+const socket = io(import.meta.env.VITE_BACKEND_URL, {
+  transports: ["websocket"]
+});
+
 
 function App() {
   const [roomID, setRoomID] = useState("");
