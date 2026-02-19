@@ -64,10 +64,16 @@ function App() {
       trickle: false,
       config: {
         iceServers: [
-          { urls: "stun:stun.l.google.com:19302" }
+          { urls: "stun:stun.l.google.com:19302" },
+          {
+            urls: "turn:openrelay.metered.ca:80",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+          }
         ]
       }
     });
+
 
     peer.on("signal", (signal) => {
       socket.emit("sending-signal", {
@@ -101,14 +107,20 @@ function App() {
     if (peerRef.current) return;
 
     const peer = new Peer({
-      initiator: false,
+      initiator: true,
       trickle: false,
       config: {
         iceServers: [
-          { urls: "stun:stun.l.google.com:19302" }
+          { urls: "stun:stun.l.google.com:19302" },
+          {
+            urls: "turn:openrelay.metered.ca:80",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+          }
         ]
       }
     });
+
 
     peer.on("signal", (signal) => {
       socket.emit("returning-signal", {
