@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
 
-const socket = io("http://localhost:2569");
+const socket = io(process.env.backend);
 
 function App() {
   const [roomID, setRoomID] = useState("");
