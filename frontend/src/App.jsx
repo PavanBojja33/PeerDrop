@@ -10,17 +10,12 @@ function App() {
 
   const peerRef = useRef(null);
 
-  // File receiving refs
   const fileMetaRef = useRef(null);
   const receivedBuffersRef = useRef([]);
   const receivedSizeRef = useRef(0);
 
-  // =========================
-  // HANDLE INCOMING DATA
-  // =========================
   const handleIncomingData = (data) => {
     try {
-      // Try metadata
       const text = new TextDecoder().decode(data);
       const meta = JSON.parse(text);
 
@@ -31,7 +26,6 @@ function App() {
         return;
       }
     } catch (err) {
-      // Not metadata → file chunk
     }
 
     if (!fileMetaRef.current) return;
@@ -50,16 +44,13 @@ function App() {
       a.download = fileMetaRef.current.fileName;
       a.click();
 
-      // Reset
       fileMetaRef.current = null;
       receivedBuffersRef.current = [];
       receivedSizeRef.current = 0;
     }
   };
 
-  // =========================
-  // CREATE INITIATOR
-  // =========================
+  
   function createPeer(userToSignal) {
     if (peerRef.current) return;
 
@@ -82,7 +73,7 @@ function App() {
     });
 
     peer.on("connect", () => {
-      console.log("✅ WebRTC Connected");
+      console.log(" WebRTC Connected");
       setConnected(true);
     });
 
@@ -100,9 +91,7 @@ function App() {
     peerRef.current = peer;
   }
 
-  // =========================
-  // CREATE RECEIVER
-  // =========================
+  
   function addPeer(incomingSignal, callerID) {
     if (peerRef.current) return;
 
@@ -124,7 +113,7 @@ function App() {
     });
 
     peer.on("connect", () => {
-      console.log("✅ WebRTC Connected");
+      console.log("WebRTC Connected");
       setConnected(true);
     });
 
@@ -144,9 +133,7 @@ function App() {
     peerRef.current = peer;
   }
 
-  // =========================
-  // SEND FILE
-  // =========================
+  
   function handleFile(e) {
     const file = e.target.files[0];
 
@@ -155,14 +142,14 @@ function App() {
       return;
     }
 
-    const chunkSize = 16 * 1024; // 16KB
+    const chunkSize = 16 * 1024; 
     const reader = new FileReader();
 
     reader.onload = () => {
       const buffer = reader.result;
       const totalSize = buffer.byteLength;
 
-      // Send metadata
+      
       peerRef.current.send(JSON.stringify({
         fileName: file.name,
         fileType: file.type,
@@ -182,9 +169,7 @@ function App() {
   }
 
 
-  // =========================
-  // SOCKET EVENTS
-  // =========================
+  
   useEffect(() => {
 
     socket.on("all-users", (users) => {
@@ -223,7 +208,7 @@ function App() {
     <div style={{ textAlign: "center", marginTop: "50px" }}>
       <h2>Browser File Share</h2>
 
-      <h3>{connected ? "Connected ✅" : "Waiting for peer..."}</h3>
+      <h3>{connected ? "Connected " : "Waiting for peer..."}</h3>
 
       <input
         placeholder="Enter Room ID"
