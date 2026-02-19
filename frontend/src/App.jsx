@@ -190,7 +190,10 @@ function App() {
   useEffect(() => {
 
     socket.on("all-users", (users) => {
-      if (users.length > 0) {
+      if (users.length == 0) {
+        console.log("Waiting for peer to join...");
+      }
+      else{
         createPeer(users[0]);
       }
     });
