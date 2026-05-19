@@ -1,0 +1,140 @@
+/* ── Drop Zone ─────────────────────────────────────────────────── */
+.pd-drop-zone {
+  border: 2px dashed rgba(255,255,255,0.15);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+  outline: none;
+}
+.pd-drop-zone:hover:not(.pd-disabled) {
+  border-color: rgba(99,102,241,0.45);
+  background: rgba(99,102,241,0.04);
+}
+.pd-drop-zone.pd-drag-over {
+  border-color: #6366f1;
+  background: rgba(99,102,241,0.1);
+}
+.pd-drop-zone.pd-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.pd-drop-inner {
+  padding: 38px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.pd-drop-icon { font-size: 38px; line-height: 1; }
+.pd-drop-title { margin: 0; font-size: 14px; font-weight: 600; color: #94a3b8; }
+.pd-drop-zone.pd-drag-over .pd-drop-title { color: #818cf8; }
+.pd-drop-hint { margin: 0; font-size: 12px; color: #475569; }
+
+/* ── File Card ─────────────────────────────────────────────────── */
+.pd-file-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+.pd-file-emoji { font-size: 20px; flex-shrink: 0; }
+.pd-file-info  { flex: 1; min-width: 0; }
+.pd-file-name  { margin: 0; font-size: 13px; font-weight: 600; color: #e2e8f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pd-file-size  { margin: 2px 0 0; font-size: 11px; color: #475569; }
+.pd-remove-btn { background: none; border: none; color: #475569; cursor: pointer; font-size: 18px; padding: 0 4px; line-height: 1; flex-shrink: 0; }
+.pd-remove-btn:hover { color: #f87171; }
+
+/* ── Target chips ──────────────────────────────────────────────── */
+.pd-target-row   { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin: 12px 0 10px; }
+.pd-target-label { font-size: 12px; color: #64748b; white-space: nowrap; }
+.pd-peer-chip {
+  padding: 4px 11px; border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: #94a3b8; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; font-family: monospace;
+}
+.pd-peer-chip:hover      { border-color: rgba(99,102,241,0.5); color: #818cf8; }
+.pd-peer-chip.pd-selected{ border-color: #6366f1; background: rgba(99,102,241,0.15); color: #818cf8; }
+.pd-peer-chip.pd-all     { border-color: rgba(139,92,246,0.4); color: #a78bfa; font-family: inherit; }
+.pd-peer-chip.pd-all.pd-selected { background: rgba(139,92,246,0.15); }
+
+/* ── Send button ───────────────────────────────────────────────── */
+.pd-send-btn {
+  width: 100%; padding: 11px; border-radius: 8px; border: none;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff; font-weight: 700; font-size: 14px;
+  cursor: pointer; transition: opacity 0.15s; font-family: inherit;
+}
+.pd-send-btn:hover:not(:disabled) { opacity: 0.88; }
+.pd-send-btn:disabled { background: #1e293b; color: #334155; cursor: not-allowed; }
+
+/* ── Peer grid ─────────────────────────────────────────────────── */
+.pd-peer-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.pd-peer-card {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 16px 14px; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+  min-width: 118px; transition: border-color 0.15s;
+}
+.pd-peer-card.pd-connected { border-color: rgba(99,102,241,0.35); }
+.pd-peer-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(99,102,241,0.1); border: 2px solid rgba(99,102,241,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; position: relative;
+}
+.pd-status-dot {
+  position: absolute; bottom: 0; right: 0;
+  width: 11px; height: 11px; border-radius: 50%; border: 2px solid #0f172a;
+}
+.pd-peer-label  { margin: 0; font-size: 12px; font-weight: 700; color: #e2e8f0; font-family: monospace; }
+.pd-peer-status { margin: 0; font-size: 11px; }
+.pd-peer-send-btn {
+  width: 100%; padding: 5px 10px; border-radius: 6px;
+  border: 1px solid rgba(99,102,241,0.4); background: rgba(99,102,241,0.1);
+  color: #818cf8; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: background 0.15s;
+}
+.pd-peer-send-btn:hover { background: rgba(99,102,241,0.22); }
+
+/* ── Progress ──────────────────────────────────────────────────── */
+.pd-progress-item {
+  padding: 11px 14px; border-radius: 9px;
+  background: rgba(255,255,255,0.03); margin-bottom: 8px;
+}
+.pd-progress-item.pd-send    { border: 1px solid rgba(99,102,241,0.3); }
+.pd-progress-item.pd-receive { border: 1px solid rgba(16,185,129,0.3); }
+.pd-progress-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.pd-progress-filename { margin: 0; font-size: 13px; font-weight: 600; color: #e2e8f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pd-progress-meta    { margin: 2px 0 0; font-size: 11px; color: #475569; }
+.pd-cancel-btn {
+  background: none; border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 5px; color: #f87171; font-size: 11px;
+  padding: 2px 8px; cursor: pointer; white-space: nowrap; flex-shrink: 0; font-family: inherit;
+}
+.pd-progress-bar-bg   { background: rgba(255,255,255,0.06); border-radius: 4px; height: 6px; overflow: hidden; }
+.pd-progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.25s ease; }
+.pd-progress-bar-fill.pd-send    { background: linear-gradient(90deg,#6366f1,#8b5cf6); }
+.pd-progress-bar-fill.pd-receive { background: linear-gradient(90deg,#10b981,#059669); }
+.pd-progress-footer { display: flex; justify-content: space-between; margin-top: 5px; font-size: 11px; color: #64748b; }
+.pd-pct { font-weight: 700; }
+.pd-pct.pd-send    { color: #818cf8; }
+.pd-pct.pd-receive { color: #34d399; }
+
+/* ── Broadcast btn ─────────────────────────────────────────────── */
+.pd-broadcast-btn {
+  padding: 6px 14px; border-radius: 7px;
+  border: 1px solid rgba(139,92,246,0.4); background: rgba(139,92,246,0.1);
+  color: #a78bfa; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s; font-family: inherit;
+}
+.pd-broadcast-btn:hover { background: rgba(139,92,246,0.2); }
