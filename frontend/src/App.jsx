@@ -1,40 +1,21 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import Navbar from './components/Navbar';
-import Home from './components/Home';
-import Room from './components/Room';
+import React, { useEffect } from 'react';
+import { Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom';
+import Landing from './pages/Landing.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+
+// Redirect /join/:code to dashboard with the code pre-filled
+function JoinRedirect() {
+  const { code } = useParams();
+  return <Navigate to={`/dashboard?join=${code}`} replace />;
+}
 
 export default function App() {
-  const [theme, setTheme] = useState(() => localStorage.getItem('pd-theme') || 'dark');
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-    localStorage.setItem('pd-theme', theme);
-  }, [theme]);
-
   return (
-    <BrowserRouter>
-      <div className={theme}>
-        <Navbar theme={theme} setTheme={setTheme} />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/room/:roomID" element={<Room />} />
-        </Routes>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 3500,
-            style: {
-              background: '#1e293b',
-              color: '#f1f5f9',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '12px',
-              fontSize: '0.875rem',
-            },
-          }}
-        />
-      </div>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/join/:code" element={<JoinRedirect />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }

@@ -1,113 +1,120 @@
-/**
- * QRScanner – uses html5-qrcode to scan a QR code with the device camera.
- * On success it calls onResult(text).
- */
-import { useEffect, useRef, useState } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import React, { useEffect, useRef, useState } from 'react';
+import jsQR from 'jsqr';
 
-export default function QRScanner({ onResult, onClose }) {
-  const scannerRef = useRef(null);
-  const [error, setError]   = useState('');
-  const [ready, setReady]   = useState(false);
-  const mountedRef = useRef(true);
+export default function QRScanner({ onScan, onCancel }) {
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [error, setError] = useState('');
+  const streamRef = useRef(null);
+  const requestRef = useRef(null);
 
   useEffect(() => {
-    mountedRef.current = true;
-    const scannerId = 'qr-scanner-region';
-    const html5qr = new Html5Qrcode(scannerId);
-    scannerRef.current = html5qr;
+    let active = true;
 
-    Html5Qrcode.getCameras()
-      .then((cameras) => {
-        if (!cameras || cameras.length === 0) {
-          setError('No camera found on this device.');
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        if (!active) {
+          stream.getTracks().forEach(track => track.stop());
           return;
         }
-        if (!mountedRef.current) return;
-        setReady(true);
-        return html5qr.start(
-          { facingMode: 'environment' },
-          { fps: 10, qrbox: { width: 220, height: 220 } },
-          (decodedText) => {
-            // Extract room ID from a full URL or treat as plain room ID
-            let roomID = decodedText.trim();
-            const match = roomID.match(/\/room\/([A-Z0-9-]+)/i);
-            if (match) roomID = match[1].toUpperCase();
-            html5qr.stop().catch(() => {});
-            onResult(roomID.toUpperCase());
-          },
-          () => { /* scan miss – ignore */ }
-        );
-      })
-      .catch((err) => {
-        if (mountedRef.current) setError(`Camera error: ${err?.message || err}`);
-      });
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.setAttribute('playsinline', true); // Required for iOS Safari
+          videoRef.current.play();
+          requestRef.current = requestAnimationFrame(tick);
+        }
+      } catch (err) {
+        if (active) {
+          setError('Unable to access camera. Please check permissions.');
+        }
+      }
+    }
+
+    function tick() {
+      if (!active) return;
+      if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
+        if (canvasRef.current) {
+          const canvas = canvasRef.current;
+          const video = videoRef.current;
+          canvas.height = video.videoHeight;
+          canvas.width = video.videoWidth;
+          const context = canvas.getContext('2d', { willReadFrequently: true });
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          try {
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: 'dontInvert',
+            });
+
+            if (code && code.data) {
+              onScan(code.data);
+              return; // Stop looping on successful scan
+            }
+          } catch (e) {
+            // Ignore temporary canvas extraction errors
+          }
+        }
+      }
+      requestRef.current = requestAnimationFrame(tick);
+    }
+
+    startCamera();
 
     return () => {
-      mountedRef.current = false;
-      scannerRef.current
-        ?.stop()
-        .catch(() => {})
-        .finally(() => scannerRef.current?.clear().catch(() => {}));
+      active = false;
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
     };
-  }, [onResult]);
+  }, [onScan]);
 
   return (
-    <div style={overlay} onClick={onClose}>
-      <div style={modal} onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#f1f5f9' }}>Scan QR Code</h3>
-          <button onClick={onClose} style={closeBtn}>✕</button>
+    <div className="relative w-full overflow-hidden rounded-lg bg-black border border-gray-200 dark:border-slate-700 aspect-square flex items-center justify-center">
+      {error ? (
+        <div className="p-5 text-center">
+            <p className="text-3xl mb-2">📸</p>
+            <p className="text-sm text-red-400">{error}</p>
+            <button 
+              onClick={onCancel}
+              className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg text-sm"
+            >
+              Go Back
+            </button>
         </div>
-
-        {error ? (
-          <div style={{ padding: 20, textAlign: 'center', color: '#f87171', fontSize: 14 }}>
-            {error}
+      ) : (
+        <>
+          <video ref={videoRef} className="w-full h-full object-cover" />
+          <canvas ref={canvasRef} className="hidden" />
+          
+          {/* Scanning Overlay UI */}
+          <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none flex items-center justify-center">
+            <div className="w-48 h-48 sm:w-56 sm:h-56 relative" style={{ boxShadow: '0 0 0 4000px rgba(0,0,0,0.4)' }}>
+                {/* Clear the center using a trick, or simply use borders. Box shadow trick is better, but border is simpler. 
+                    Actually, replacing the background with a 4-border div is perfectly transparent in the center! */}
+                <div className="absolute inset-0 border-2 border-indigo-500/50"></div>
+                {/* Corner accents */}
+                <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-indigo-500"></div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-indigo-500"></div>
+                <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-indigo-500"></div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-indigo-500"></div>
+                
+                {/* Scanning laser line animation */}
+                <div className="w-full h-0.5 bg-indigo-400 shadow-[0_0_8px_2px_rgba(99,102,241,0.6)] animate-[scan_2s_ease-in-out_infinite] absolute top-0"></div>
+            </div>
           </div>
-        ) : (
-          <>
-            <p style={{ margin: '0 0 12px', fontSize: 13, color: '#94a3b8', textAlign: 'center' }}>
-              Point your camera at a PeerDrop QR code
-            </p>
-            {/* html5-qrcode mounts into this div */}
-            <div
-              id="qr-scanner-region"
-              style={{
-                width: '100%',
-                borderRadius: 10,
-                overflow: 'hidden',
-                background: '#000',
-                minHeight: 260,
-              }}
-            />
-            {!ready && (
-              <p style={{ margin: '12px 0 0', textAlign: 'center', color: '#64748b', fontSize: 13 }}>
-                Starting camera…
-              </p>
-            )}
-          </>
-        )}
-
-        <button onClick={onClose} style={{ ...closeBtn, width: '100%', marginTop: 16, padding: '10px', borderRadius: 8, fontSize: 14 }}>
-          Cancel
-        </button>
-      </div>
+          
+          <button 
+            onClick={onCancel}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm font-medium z-20 shadow-lg"
+          >
+            Cancel Scan
+          </button>
+        </>
+      )}
     </div>
   );
 }
-
-const overlay = {
-  position: 'fixed', inset: 0, zIndex: 1000,
-  background: 'rgba(0,0,0,0.75)',
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-  padding: 16,
-};
-const modal = {
-  background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)',
-  borderRadius: 14, padding: 24, width: '100%', maxWidth: 380,
-};
-const closeBtn = {
-  background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
-  color: '#94a3b8', borderRadius: 6, padding: '4px 12px',
-  cursor: 'pointer', fontSize: 13,
-};

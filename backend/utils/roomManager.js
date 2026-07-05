@@ -1,50 +1,111 @@
+'use strict';
+
+// ── Room Manager ──
+// Pure in-memory store. No database. Rooms expire after 30 minutes.
+
+const ROOM_EXPIRY_MS = 30 * 60 * 1000; // 30 minutes
+
+/** @type {Map<string, {hostId:string, peers:Set<string>, createdAt:number, timer:NodeJS.Timeout}>} */
+const rooms = new Map();
+
 /**
- * RoomManager – no user limit. Tracks rooms and their members.
+ * Generate a random 6-digit room code that doesn't collide with existing rooms.
  */
-
-class RoomManager {
-  constructor() {
-    // Map<roomID, Set<socketID>>
-    this.rooms = new Map();
-  }
-
-  /**
-   * Add a socket to a room (idempotent – rejoining returns current peers).
-   * Returns { users: string[] }  (other members)
-   */
-  joinRoom(roomID, socketID) {
-    if (!this.rooms.has(roomID)) {
-      this.rooms.set(roomID, new Set());
-    }
-    const room = this.rooms.get(roomID);
-    room.add(socketID); // Set.add is idempotent
-    const users = Array.from(room).filter((id) => id !== socketID);
-    return { users };
-  }
-
-  /**
-   * Remove a socket from all rooms.
-   * Returns list of { roomID, remaining[] } for each affected room.
-   */
-  leaveAllRooms(socketID) {
-    const affected = [];
-    for (const [roomID, members] of this.rooms.entries()) {
-      if (members.has(socketID)) {
-        members.delete(socketID);
-        affected.push({ roomID, remaining: Array.from(members) });
-        if (members.size === 0) this.rooms.delete(roomID);
-      }
-    }
-    return affected;
-  }
-
-  getRoomMembers(roomID) {
-    return this.rooms.has(roomID) ? Array.from(this.rooms.get(roomID)) : [];
-  }
-
-  getRoomCount() {
-    return this.rooms.size;
-  }
+function generateCode() {
+  let code;
+  let attempts = 0;
+  do {
+    code = String(Math.floor(100000 + Math.random() * 900000));
+    attempts++;
+    if (attempts > 1000) throw new Error('Cannot generate unique room code');
+  } while (rooms.has(code));
+  return code;
 }
 
-module.exports = new RoomManager();
+/**
+ * Create a new room for a host socket.
+ * @param {string} hostId - socket.id of host
+ * @returns {string} 6-digit room code
+ */
+function createRoom(hostId) {
+  const code = generateCode();
+  const timer = setTimeout(() => {
+    console.log(`[Room] ${code} expired`);
+    rooms.delete(code);
+  }, ROOM_EXPIRY_MS);
+
+  rooms.set(code, {
+    hostId,
+    peers: new Set([hostId]),
+    createdAt: Date.now(),
+    timer,
+  });
+
+  return code;
+}
+
+/**
+ * Attempt to join an existing room.
+ * @param {string} code - room code
+ * @param {string} peerId - socket.id of joiner
+ * @returns {{ success: boolean, hostId?: string, error?: string }}
+ */
+function joinRoom(code, peerId) {
+  const room = rooms.get(code);
+  if (!room) return { success: false, error: 'Room not found or has expired' };
+  if (room.peers.size >= 2) return { success: false, error: 'Room is full (max 2 peers)' };
+  if (room.peers.has(peerId)) return { success: false, error: 'Already in this room' };
+
+  room.peers.add(peerId);
+  return { success: true, hostId: room.hostId };
+}
+
+/**
+ * Remove a peer from any room they are in.
+ * @param {string} peerId
+ * @returns {{ code: string, wasHost: boolean, otherId: string|null } | null}
+ */
+function leaveRoom(peerId) {
+  for (const [code, room] of rooms.entries()) {
+    if (!room.peers.has(peerId)) continue;
+
+    room.peers.delete(peerId);
+
+    // Find the remaining peer (if any)
+    let otherId = null;
+    for (const id of room.peers) {
+      otherId = id;
+      break;
+    }
+
+    const wasHost = room.hostId === peerId;
+
+    // If room is now empty OR host left, clean up
+    if (room.peers.size === 0 || wasHost) {
+      clearTimeout(room.timer);
+      rooms.delete(code);
+    }
+
+    return { code, wasHost, otherId };
+  }
+  return null;
+}
+
+/**
+ * Get room info by peer id.
+ * @param {string} peerId
+ * @returns {{ code: string, room: object } | null}
+ */
+function getRoomByPeer(peerId) {
+  for (const [code, room] of rooms.entries()) {
+    if (room.peers.has(peerId)) return { code, room };
+  }
+  return null;
+}
+
+/** Active room count (for health checks). */
+function roomCount() {
+  return rooms.size;
+}
+
+module.exports = { createRoom, joinRoom, leaveRoom, getRoomByPeer, roomCount };

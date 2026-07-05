@@ -1,40 +1,74 @@
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { usePeer } from '../context/PeerContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 
-export default function Navbar({ theme, setTheme }) {
+export default function Navbar() {
+  const { status, roomCode, disconnect } = usePeer();
+  const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isDashboard = location.pathname === '/dashboard';
+
+  const statusText = {
+    idle: 'Not connected',
+    connecting: 'Connecting...',
+    connected: roomCode ? `Room: ${roomCode}` : 'Connected',
+    disconnected: 'Disconnected',
+  };
+
+  const statusColor = {
+    idle: 'bg-gray-400',
+    connecting: 'bg-yellow-400',
+    connected: 'bg-green-500',
+    disconnected: 'bg-red-500',
+  };
+
   return (
-    <nav style={{
-      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40,
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '0 20px', height: 56,
-      background: 'rgba(15,23,42,0.9)',
-      borderBottom: '1px solid rgba(255,255,255,0.06)',
-      backdropFilter: 'blur(8px)',
-    }}>
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-        <div style={{
-          width: 28, height: 28, borderRadius: 8,
-          background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
-        }}>
-          ⚡
-        </div>
-        <span style={{ fontWeight: 800, fontSize: 18, color: '#f1f5f9' }}>
-          Peer<span style={{ color: '#818cf8' }}>Drop</span>
-        </span>
-      </Link>
+    <header className="sticky top-0 z-40 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
 
-      <button
-        id="theme-toggle"
-        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-        style={{
-          background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-          color: '#94a3b8', borderRadius: 7, padding: '5px 12px',
-          cursor: 'pointer', fontSize: 13,
-        }}
-        aria-label="Toggle theme"
-      >
-        {theme === 'dark' ? '☀ Light' : '🌙 Dark'}
-      </button>
-    </nav>
+        <button onClick={() => navigate('/')} className="flex items-center gap-2">
+          <span className="text-xl">🪂</span>
+          <span className="font-bold text-gray-900 dark:text-white">PeerDrop</span>
+        </button>
+
+        {isDashboard && (
+          <div className="flex items-center gap-2 text-sm">
+            <span className={`w-2 h-2 rounded-full ${statusColor[status] || 'bg-gray-400'}`}></span>
+            <span className="text-gray-600 dark:text-gray-400 hidden sm:inline">
+              {statusText[status] || 'Unknown'}
+            </span>
+          </div>
+        )}
+
+        <div className="flex items-center gap-2">
+          {isDashboard && status === 'connected' && (
+            <button
+              onClick={disconnect}
+              className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg"
+            >
+              Disconnect
+            </button>
+          )}
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+          {!isDashboard && (
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded-lg"
+            >
+              Open App
+            </button>
+          )}
+        </div>
+
+      </div>
+    </header>
   );
 }
