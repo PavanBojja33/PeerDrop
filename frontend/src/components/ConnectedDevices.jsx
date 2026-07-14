@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { usePeer } from '../context/PeerContext.jsx';
+import { FiMonitor, FiSmartphone, FiEdit2 } from 'react-icons/fi';
 
 export default function ConnectedDevices() {
   const { status, localDeviceName, peerDeviceName, setLocalDeviceName } = usePeer();
@@ -38,7 +39,7 @@ export default function ConnectedDevices() {
         ) : (
           <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-600">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">💻</span>
+              <FiMonitor className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               <div>
                 <p className="font-medium text-sm text-gray-900 dark:text-white">{localDeviceName || 'My Device'}</p>
                 <p className="text-xs text-green-600 dark:text-green-400">● You</p>
@@ -46,9 +47,9 @@ export default function ConnectedDevices() {
             </div>
             <button
               onClick={() => { setEditing(true); setNameInput(localDeviceName); }}
-              className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-1"
             >
-              ✏️ Edit
+              <FiEdit2 className="w-3 h-3" /> Edit
             </button>
           </div>
         )}
@@ -60,7 +61,7 @@ export default function ConnectedDevices() {
 
         {status === 'connected' && peerDeviceName ? (
           <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-200 dark:border-green-800">
-            <span className="text-2xl">📱</span>
+            <FiSmartphone className="w-5 h-5 text-green-600 dark:text-green-400" />
             <div>
               <p className="font-medium text-sm text-gray-900 dark:text-white">{peerDeviceName}</p>
               <p className="text-xs text-green-600 dark:text-green-400">● Online</p>
@@ -68,7 +69,7 @@ export default function ConnectedDevices() {
           </div>
         ) : status === 'connecting' ? (
           <div className="p-3 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-600">
-            <p className="text-sm text-gray-500 dark:text-gray-400">⏳ Waiting for peer...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Waiting for peer...</p>
           </div>
         ) : (
           <div className="p-3 bg-gray-50 dark:bg-slate-900 rounded-lg border border-dashed border-gray-200 dark:border-slate-600">

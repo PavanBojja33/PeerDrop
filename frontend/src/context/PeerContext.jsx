@@ -53,6 +53,31 @@ export function PeerProvider({ children }) {
   // We store them here and apply them once the remote description is set.
   const iceCandidateQueue = useRef([]);
 
+  // ─── Save to localStorage history ─────────────────────────────────────
+  function saveHistory(entry) {
+    const existing = JSON.parse(localStorage.getItem('pd_history') || '[]');
+    const updated = [{ id: Date.now(), timestamp: Date.now(), ...entry }, ...existing].slice(0, 50);
+    localStorage.setItem('pd_history', JSON.stringify(updated));
+  }
+
+  // ─── Cleanup WebRTC connections ────────────────────────────────────────
+  function cleanupWebRTC() {
+    if (pc.current) {
+      try {
+        pc.current.close();
+      } catch {
+        // Ignore close error
+      }
+    }
+    pc.current = null;
+    controlCh.current = null;
+    binaryCh.current = null;
+    remotePeerId.current = '';
+    iceCandidateQueue.current = [];
+    rxFiles.current = {};
+    txWaiters.current = {};
+  }
+
   // ─── Helper: send a JSON message through the control channel ────────────
   function sendControl(obj) {
     if (controlCh.current && controlCh.current.readyState === 'open') {
@@ -272,7 +297,7 @@ export function PeerProvider({ children }) {
     for (const candidate of iceCandidateQueue.current) {
       try {
         await peer.addIceCandidate(new RTCIceCandidate(candidate));
-      } catch (e) {
+      } catch {
         // Ignore — stale or duplicate candidate
       }
     }
@@ -304,7 +329,9 @@ export function PeerProvider({ children }) {
         for (const candidate of iceCandidateQueue.current) {
           try {
             await pc.current.addIceCandidate(new RTCIceCandidate(candidate));
-          } catch (e) {}
+          } catch {
+            // Ignore stale candidate
+          }
         }
         iceCandidateQueue.current = [];
       }
@@ -315,7 +342,7 @@ export function PeerProvider({ children }) {
         // Remote description already set — add the candidate right now
         try {
           await pc.current.addIceCandidate(new RTCIceCandidate(candidate));
-        } catch (err) {
+        } catch {
           // Can happen during normal setup, safe to ignore
         }
       } else {
@@ -340,14 +367,8 @@ export function PeerProvider({ children }) {
       socket.off('ice-candidate');
       socket.off('peer-disconnected');
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ─── Save to localStorage history ─────────────────────────────────────
-  function saveHistory(entry) {
-    const existing = JSON.parse(localStorage.getItem('pd_history') || '[]');
-    const updated = [{ id: Date.now(), timestamp: Date.now(), ...entry }, ...existing].slice(0, 50);
-    localStorage.setItem('pd_history', JSON.stringify(updated));
-  }
 
   // ─── Public methods ────────────────────────────────────────────────────
 
@@ -408,21 +429,6 @@ export function PeerProvider({ children }) {
         socket.once('connect', doJoin);
       }
     });
-  }
-
-  function cleanupWebRTC() {
-    if (pc.current) {
-      try {
-        pc.current.close();
-      } catch (e) {}
-    }
-    pc.current = null;
-    controlCh.current = null;
-    binaryCh.current = null;
-    remotePeerId.current = '';
-    iceCandidateQueue.current = [];
-    rxFiles.current = {};
-    txWaiters.current = {};
   }
 
   function disconnect() {
@@ -517,7 +523,7 @@ export function PeerProvider({ children }) {
 
         saveHistory({ direction: 'sent', name: file.name, size: file.size, status: 'done' });
 
-      } catch (err) {
+      } catch {
         setActiveTransfers(prev => ({ ...prev, [fileId]: { ...prev[fileId], status: 'error' } }));
         setTimeout(() => {
           setActiveTransfers(prev => {

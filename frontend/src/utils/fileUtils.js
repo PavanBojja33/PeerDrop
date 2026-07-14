@@ -8,13 +8,13 @@ export function formatBytes(bytes) {
 }
 
 export function getFileIcon(mimeType = '') {
-  if (mimeType.startsWith('image/')) return '🖼️';
-  if (mimeType.startsWith('video/')) return '🎬';
-  if (mimeType.startsWith('audio/')) return '🎵';
-  if (mimeType === 'application/pdf') return '📄';
-  if (mimeType.includes('zip') || mimeType.includes('rar')) return '🗜️';
-  if (mimeType.startsWith('text/')) return '📃';
-  return '📁';
+  if (mimeType.startsWith('image/')) return 'image';
+  if (mimeType.startsWith('video/')) return 'video';
+  if (mimeType.startsWith('audio/')) return 'audio';
+  if (mimeType === 'application/pdf') return 'pdf';
+  if (mimeType.includes('zip') || mimeType.includes('rar')) return 'zip';
+  if (mimeType.startsWith('text/')) return 'text';
+  return 'file';
 }
 
 export function isPreviewable(mimeType = '') {

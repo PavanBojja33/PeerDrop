@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePeer } from '../context/PeerContext.jsx';
+import { FiMessageSquare, FiSend } from 'react-icons/fi';
 
 export default function TextChatPanel() {
   const { messages, sendMessage, peerDeviceName, localDeviceName } = usePeer();
@@ -36,7 +37,9 @@ export default function TextChatPanel() {
       <div className="flex-1 overflow-y-auto space-y-2 mb-4 pr-1">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
-            <p className="text-3xl mb-2">💬</p>
+            <div className="flex justify-center mb-2">
+              <FiMessageSquare className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+            </div>
             <p className="text-sm">No messages yet. Say hello!</p>
           </div>
         ) : (
@@ -61,7 +64,7 @@ export default function TextChatPanel() {
 
       <form onSubmit={handleSend} className="flex gap-2 shrink-0">
         <textarea
-          className="flex-1 px-3 py-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white resize-none outline-none focus:border-indigo-500"
+          className="flex-1 px-3 py-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white resize-none outline-none focus:border-indigo-500 text-sm"
           rows={2}
           placeholder="Type a message... (Enter to send)"
           value={input}
@@ -72,9 +75,10 @@ export default function TextChatPanel() {
         <button
           type="submit"
           disabled={!input.trim()}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg self-end"
+          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg self-end flex items-center justify-center"
+          aria-label="Send message"
         >
-          ➤
+          <FiSend className="w-4 h-4" />
         </button>
       </form>
     </div>

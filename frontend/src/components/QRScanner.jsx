@@ -21,11 +21,11 @@ export default function QRScanner({ onScan, onCancel }) {
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          videoRef.current.setAttribute('playsinline', true); // Required for iOS Safari
+          videoRef.current.setAttribute('playsinline', true); 
           videoRef.current.play();
           requestRef.current = requestAnimationFrame(tick);
         }
-      } catch (err) {
+      } catch {
         if (active) {
           setError('Unable to access camera. Please check permissions.');
         }
@@ -53,7 +53,7 @@ export default function QRScanner({ onScan, onCancel }) {
               onScan(code.data);
               return; // Stop looping on successful scan
             }
-          } catch (e) {
+          } catch {
             // Ignore temporary canvas extraction errors
           }
         }

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { formatBytes } from '../utils/fileUtils.js';
+import { FiMusic, FiFileText, FiDownload } from 'react-icons/fi';
 
 export default function FilePreviewModal({ file, onClose }) {
   useEffect(() => {
@@ -21,9 +22,11 @@ export default function FilePreviewModal({ file, onClose }) {
     }
     if (mimeType.startsWith('audio/')) {
       return (
-        <div className="text-center py-8">
-          <p className="text-5xl mb-4">🎵</p>
-          <p className="font-medium mb-4 text-gray-900 dark:text-white">{name}</p>
+        <div className="text-center py-8 w-full">
+          <div className="flex justify-center mb-4">
+            <FiMusic className="w-12 h-12 text-indigo-500" />
+          </div>
+          <p className="font-medium mb-4 text-gray-900 dark:text-white truncate px-4">{name}</p>
           <audio src={url} controls className="w-full" />
         </div>
       );
@@ -33,7 +36,9 @@ export default function FilePreviewModal({ file, onClose }) {
     }
     return (
       <div className="text-center py-10 text-gray-400">
-        <p className="text-5xl mb-3">📄</p>
+        <div className="flex justify-center mb-3">
+          <FiFileText className="w-12 h-12 text-gray-400" />
+        </div>
         <p className="text-sm">Preview not available</p>
       </div>
     );
@@ -48,7 +53,7 @@ export default function FilePreviewModal({ file, onClose }) {
 
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white truncate">{file.name}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white truncate max-w-md">{file.name}</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400">{formatBytes(file.size)}</p>
           </div>
           <button
@@ -66,9 +71,9 @@ export default function FilePreviewModal({ file, onClose }) {
         <a
           href={file.url}
           download={file.name}
-          className="block w-full text-center py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium"
+          className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2"
         >
-          ⬇️ Download {file.name}
+          <FiDownload className="w-4 h-4" /> Download {file.name}
         </a>
 
       </div>

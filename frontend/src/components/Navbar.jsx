@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { usePeer } from '../context/PeerContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
+import { FiSun, FiMoon, FiShare2 } from 'react-icons/fi';
 
 export default function Navbar() {
   const { status, roomCode, disconnect } = usePeer();
@@ -30,7 +31,7 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
 
         <button onClick={() => navigate('/')} className="flex items-center gap-2">
-          <span className="text-xl">🪂</span>
+          <FiShare2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
           <span className="font-bold text-gray-900 dark:text-white">PeerDrop</span>
         </button>
 
@@ -54,9 +55,10 @@ export default function Navbar() {
           )}
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg"
+            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg flex items-center justify-center"
+            aria-label="Toggle theme"
           >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'dark' ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
           </button>
           {!isDashboard && (
             <button

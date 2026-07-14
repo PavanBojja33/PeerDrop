@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { usePeer } from '../context/PeerContext.jsx';
+import { FiLink, FiShare2 } from 'react-icons/fi';
 import Navbar from '../components/Navbar.jsx';
 import RoomPanel from '../components/RoomPanel.jsx';
 import ConnectedDevices from '../components/ConnectedDevices.jsx';
@@ -18,13 +19,6 @@ export default function Dashboard() {
   const [nameError, setNameError] = useState('');
   const [activeTab, setActiveTab] = useState('files');
   const { requestPermission } = useNotifications();
-
-  useEffect(() => {
-    if (localDeviceName) {
-      setNameInput(localDeviceName);
-      setNameSet(true);
-    }
-  }, [localDeviceName]);
 
   function handleSetName(e) {
     e.preventDefault();
@@ -49,7 +43,9 @@ export default function Dashboard() {
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 w-full max-w-sm">
             <div className="text-center mb-6">
-              <p className="text-4xl mb-3">🪂</p>
+              <div className="flex justify-center mb-3">
+                <FiShare2 className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+              </div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Welcome to PeerDrop</h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Enter a name so your peer knows who's connecting</p>
             </div>
@@ -70,7 +66,7 @@ export default function Dashboard() {
                 {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
               </div>
               <button type="submit" className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium">
-                Continue →
+                Continue
               </button>
             </form>
           </div>
@@ -100,10 +96,10 @@ export default function Dashboard() {
               <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-1.5">
                 <div className="flex gap-1">
                   {[
-                    { id: 'files', label: '📁 Files' },
-                    { id: 'clipboard', label: '📋 Clipboard' },
-                    { id: 'chat', label: '💬 Chat' },
-                    { id: 'history', label: '🕑 History' },
+                    { id: 'files', label: 'Files' },
+                    { id: 'clipboard', label: 'Clipboard' },
+                    { id: 'chat', label: 'Chat' },
+                    { id: 'history', label: 'History' },
                   ].map(tab => (
                     <button
                       key={tab.id}
@@ -124,7 +120,9 @@ export default function Dashboard() {
             {/* Panel content */}
             {!isConnected ? (
               <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-12 text-center">
-                <p className="text-5xl mb-4">🔗</p>
+                <div className="flex justify-center mb-4">
+                  <FiLink className="w-12 h-12 text-gray-400 dark:text-gray-500" />
+                </div>
                 <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-2">Not connected</h3>
                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                   Create or join a room on the left to start sharing.

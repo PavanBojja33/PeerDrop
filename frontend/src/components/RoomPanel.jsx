@@ -3,6 +3,14 @@ import { QRCodeSVG } from 'qrcode.react';
 import { usePeer } from '../context/PeerContext.jsx';
 import { useNotifications } from '../hooks/useNotifications.js';
 import QRScanner from './QRScanner.jsx';
+import {
+  FiCopy,
+  FiLink,
+  FiCamera,
+  FiAlertTriangle,
+  FiCheck,
+  FiLogOut,
+} from 'react-icons/fi';
 
 export default function RoomPanel({ joinCodeFromURL = null }) {
   const { status, roomCode, localDeviceName, createRoom, joinRoom, disconnect } = usePeer();
@@ -15,14 +23,6 @@ export default function RoomPanel({ joinCodeFromURL = null }) {
   const [showQR, setShowQR] = useState(false);
   const [copied, setCopied] = useState('');
   const [isScanning, setIsScanning] = useState(false);
-
-  // Auto-join if URL has a code
-  useEffect(() => {
-    if (joinCodeFromURL && localDeviceName && status === 'idle') {
-      setMode('join');
-      handleJoin(joinCodeFromURL);
-    }
-  }, []);
 
   async function handleCreate() {
     requestPermission();
@@ -52,6 +52,15 @@ export default function RoomPanel({ joinCodeFromURL = null }) {
     }
     setLoading(false);
   }
+
+  // Auto-join if URL has a code
+  useEffect(() => {
+    if (joinCodeFromURL && localDeviceName && status === 'idle') {
+      setMode('join');
+      handleJoin(joinCodeFromURL);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleScan(data) {
     setIsScanning(false);
@@ -116,7 +125,7 @@ export default function RoomPanel({ joinCodeFromURL = null }) {
           onClick={() => setShowQR(!showQR)}
           className="w-full py-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 mb-3"
         >
-          {showQR ? 'Hide QR Code' : '📷 Show QR Code'}
+          {showQR ? 'Hide QR Code' : 'Show QR Code'}
         </button>
 
         {showQR && (
@@ -129,14 +138,22 @@ export default function RoomPanel({ joinCodeFromURL = null }) {
           onClick={() => copyText(roomCode, 'code')}
           className="w-full py-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 mb-2"
         >
-          {copied === 'code' ? '✅ Copied!' : '📋 Copy Code'}
+          {copied === 'code' ? (
+            <span className="flex items-center justify-center gap-1.5"><FiCheck className="w-4 h-4 text-green-500" /> Copied!</span>
+          ) : (
+            <span className="flex items-center justify-center gap-1.5"><FiCopy className="w-4 h-4" /> Copy Code</span>
+          )}
         </button>
 
         <button
           onClick={() => copyText(inviteLink, 'link')}
           className="w-full py-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 mb-3"
         >
-          {copied === 'link' ? '✅ Copied!' : '🔗 Copy Invite Link'}
+          {copied === 'link' ? (
+            <span className="flex items-center justify-center gap-1.5"><FiCheck className="w-4 h-4 text-green-500" /> Copied!</span>
+          ) : (
+            <span className="flex items-center justify-center gap-1.5"><FiLink className="w-4 h-4" /> Copy Invite Link</span>
+          )}
         </button>
 
         <button
@@ -183,7 +200,7 @@ export default function RoomPanel({ joinCodeFromURL = null }) {
             disabled={loading}
             className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium"
           >
-            {loading ? 'Creating...' : '✨ Create Room'}
+            {loading ? 'Creating...' : 'Create Room'}
           </button>
         </div>
       ) : isScanning ? (
@@ -210,14 +227,14 @@ export default function RoomPanel({ joinCodeFromURL = null }) {
               disabled={loading || codeInput.length !== 6}
               className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium"
             >
-              {loading ? 'Joining...' : '🚪 Join Room'}
+              {loading ? 'Joining...' : 'Join Room'}
             </button>
             <button
               onClick={() => setIsScanning(true)}
-              className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-white rounded-lg text-sm font-medium border border-gray-200 dark:border-slate-600"
+              className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-white rounded-lg text-sm font-medium border border-gray-200 dark:border-slate-600 flex items-center justify-center gap-1.5"
               title="Scan QR Code"
             >
-              📷 Scan
+              <FiCamera className="w-4 h-4" /> Scan
             </button>
           </div>
         </div>
@@ -230,8 +247,8 @@ export default function RoomPanel({ joinCodeFromURL = null }) {
       )}
 
       {status === 'disconnected' && (
-        <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-sm text-yellow-700 dark:text-yellow-400">
-          ⚠️ Peer disconnected. Create or join a new room.
+        <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-sm text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
+          <FiAlertTriangle className="w-4 h-4 text-yellow-600 shrink-0" /> Peer disconnected. Create or join a new room.
         </div>
       )}
     </div>

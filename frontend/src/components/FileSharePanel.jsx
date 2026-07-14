@@ -2,6 +2,36 @@ import React, { useState, useRef } from 'react';
 import { usePeer } from '../context/PeerContext.jsx';
 import { formatBytes, getFileIcon, isPreviewable } from '../utils/fileUtils.js';
 import FilePreviewModal from './FilePreviewModal.jsx';
+import {
+  FiImage,
+  FiVideo,
+  FiMusic,
+  FiFileText,
+  FiArchive,
+  FiFile,
+  FiFolderPlus,
+  FiCheck,
+  FiX,
+  FiUploadCloud,
+  FiEye,
+  FiDownload,
+  FiArrowDown,
+} from 'react-icons/fi';
+
+const iconMap = {
+  image: FiImage,
+  video: FiVideo,
+  audio: FiMusic,
+  pdf: FiFileText,
+  zip: FiArchive,
+  text: FiFileText,
+  file: FiFile,
+};
+
+function FileIcon({ type, className }) {
+  const IconComponent = iconMap[type] || FiFile;
+  return <IconComponent className={className} />;
+}
 
 export default function FileSharePanel() {
   const { sendFiles, incomingRequests, activeTransfers, receivedFiles, acceptFile, rejectFile } = usePeer();
@@ -53,7 +83,7 @@ export default function FileSharePanel() {
         <div key={req.fileId} className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">{getFileIcon(req.mimeType)}</span>
+              <FileIcon type={getFileIcon(req.mimeType)} className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
               <div>
                 <p className="font-medium text-sm text-gray-900 dark:text-white">{req.name}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">{formatBytes(req.size)}</p>
@@ -62,19 +92,21 @@ export default function FileSharePanel() {
             <div className="flex gap-2">
               <button
                 onClick={() => acceptFile(req.fileId)}
-                className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg"
+                className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg flex items-center gap-1"
               >
-                ✅ Accept
+                <FiCheck className="w-3.5 h-3.5" /> Accept
               </button>
               <button
                 onClick={() => rejectFile(req.fileId)}
-                className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg"
+                className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg flex items-center gap-1"
               >
-                ✕ Reject
+                <FiX className="w-3.5 h-3.5" /> Reject
               </button>
             </div>
           </div>
-          <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-2">📥 Incoming file from peer</p>
+          <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-2 flex items-center gap-1">
+            <FiArrowDown className="w-3.5 h-3.5" /> Incoming file from peer
+          </p>
         </div>
       ))}
 
@@ -87,7 +119,7 @@ export default function FileSharePanel() {
               <div key={t.fileId}>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="flex items-center gap-2">
-                    <span>{getFileIcon(t.mimeType)}</span>
+                    <FileIcon type={getFileIcon(t.mimeType)} className="w-5 h-5 text-gray-500" />
                     <span className="text-gray-900 dark:text-white truncate max-w-xs">{t.name}</span>
                   </span>
                   <span className="text-gray-500 dark:text-gray-400">{t.progress}%</span>
@@ -101,9 +133,9 @@ export default function FileSharePanel() {
                   />
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {t.direction === 'sending' ? '⬆️ Sending' : '⬇️ Receiving'}
+                  {t.direction === 'sending' ? 'Sending' : 'Receiving'}
                   {t.status === 'waiting' ? ' — waiting for accept...' : ''}
-                  {t.status === 'done' ? ' — Done!' : ''}
+                  {t.status === 'done' ? ' — Done' : ''}
                   {t.status === 'error' ? ' — Failed' : ''}
                 </p>
               </div>
@@ -126,7 +158,9 @@ export default function FileSharePanel() {
           onDrop={onDrop}
           onClick={() => fileInputRef.current?.click()}
         >
-          <p className="text-3xl mb-2">📂</p>
+          <div className="flex justify-center mb-3">
+            <FiUploadCloud className="w-10 h-10 text-indigo-500" />
+          </div>
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Drop files here or click to browse</p>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Images · Videos · PDFs · ZIPs · Documents</p>
           <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(e) => addFiles(e.target.files)} />
@@ -135,9 +169,9 @@ export default function FileSharePanel() {
         {/* Folder select */}
         <button
           onClick={() => folderInputRef.current?.click()}
-          className="w-full py-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 mb-4"
+          className="w-full py-2 border border-gray-200 dark:border-slate-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 mb-4 flex items-center justify-center gap-2"
         >
-          📁 Select Folder
+          <FiFolderPlus className="w-4 h-4" /> Select Folder
         </button>
         <input
           ref={folderInputRef}
@@ -154,7 +188,7 @@ export default function FileSharePanel() {
             {selectedFiles.map((f, i) => (
               <div key={f.name + f.size} className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-600 text-sm">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span>{getFileIcon(f.type)}</span>
+                  <FileIcon type={getFileIcon(f.type)} className="w-5 h-5 text-gray-500" />
                   <div className="min-w-0">
                     <p className="font-medium text-gray-900 dark:text-white truncate">{f.name}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">{formatBytes(f.size)}</p>
@@ -176,7 +210,7 @@ export default function FileSharePanel() {
           disabled={selectedFiles.length === 0 || sending}
           className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium"
         >
-          {sending ? '⏳ Sending...' : selectedFiles.length > 0 ? `⬆️ Send ${selectedFiles.length} File${selectedFiles.length > 1 ? 's' : ''}` : '⬆️ Select Files to Send'}
+          {sending ? 'Sending...' : selectedFiles.length > 0 ? `Send ${selectedFiles.length} File${selectedFiles.length > 1 ? 's' : ''}` : 'Select Files to Send'}
         </button>
       </div>
 
@@ -188,7 +222,7 @@ export default function FileSharePanel() {
             {receivedFiles.map(f => (
               <div key={f.fileId} className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-600 text-sm">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span>{getFileIcon(f.mimeType)}</span>
+                  <FileIcon type={getFileIcon(f.mimeType)} className="w-5 h-5 text-gray-500" />
                   <div className="min-w-0">
                     <p className="font-medium text-gray-900 dark:text-white truncate">{f.name}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">{formatBytes(f.size)}</p>
@@ -196,12 +230,12 @@ export default function FileSharePanel() {
                 </div>
                 <div className="flex gap-2 ml-2 shrink-0">
                   {isPreviewable(f.mimeType) && (
-                    <button onClick={() => setPreviewFile(f)} className="px-2 py-1 text-xs border border-gray-200 dark:border-slate-600 rounded-lg text-gray-600 dark:text-gray-300">
-                      👁️ Preview
+                    <button onClick={() => setPreviewFile(f)} className="px-2 py-1 text-xs border border-gray-200 dark:border-slate-600 rounded-lg text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                      <FiEye className="w-3 h-3" /> Preview
                     </button>
                   )}
-                  <a href={f.url} download={f.name} className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-lg">
-                    ⬇️ Download
+                  <a href={f.url} download={f.name} className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-lg flex items-center gap-1">
+                    <FiDownload className="w-3 h-3" /> Download
                   </a>
                 </div>
               </div>

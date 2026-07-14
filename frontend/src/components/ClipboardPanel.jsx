@@ -20,7 +20,7 @@ export default function ClipboardPanel() {
       sendClipboard(text);
       setStatus('Clipboard sent!');
       setTimeout(() => setStatus(''), 2500);
-    } catch (e) {
+    } catch {
       setError('Could not read clipboard. Try using the text box below instead.');
     }
   }

@@ -39,5 +39,5 @@ app.use((err, _req, res, _next) => {
 
 const PORT = process.env.PORT || 2005;
 server.listen(PORT, () => {
-  console.log(`🚀 PeerDrop signaling server running on port ${PORT}`);
+  console.log(`PeerDrop signaling server running on port ${PORT}`);
 });

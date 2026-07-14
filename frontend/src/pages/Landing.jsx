@@ -1,15 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext.jsx';
-
-const features = [
-  { icon: '⚡', title: 'Lightning Fast', desc: 'WebRTC transfers files directly between browsers at full network speed.' },
-  { icon: '🔒', title: 'Private by Design', desc: 'Files never touch a server. Your data goes directly to your peer.' },
-  { icon: '📱', title: 'Cross Platform', desc: 'Works on any device with a modern browser — phone, tablet, or laptop.' },
-  { icon: '🔗', title: 'Easy Pairing', desc: 'Connect with a 6-digit code, QR scan, or a shareable invite link.' },
-  { icon: '📂', title: 'Any File Type', desc: 'Images, videos, PDFs, ZIPs, documents, audio — share anything.' },
-  { icon: '💬', title: 'Chat & Clipboard', desc: 'Share text, URLs, and code snippets alongside your files.' },
-];
+import { FiSun, FiMoon, FiShare2, FiZap, FiLock, FiCpu } from 'react-icons/fi';
 
 const steps = [
   { n: '1', title: 'Enter Your Name', desc: 'No account needed. Just type a name so your peer knows who you are.' },
@@ -18,16 +10,9 @@ const steps = [
 ];
 
 const advantages = [
-  { icon: '🚫', title: 'No Installation', desc: 'Runs in the browser. Nothing to download.' },
-  { icon: '🔑', title: 'No Login', desc: 'Zero accounts, zero registration.' },
-  { icon: '🌐', title: 'Browser-to-Browser', desc: 'Direct WebRTC — no middleman for data.' },
-  { icon: '☁️', title: 'No Cloud Storage', desc: 'Files never uploaded to any server.' },
-  { icon: '💻', title: 'Cross Platform', desc: 'Chrome, Firefox, Safari, Edge.' },
-  { icon: '🚀', title: 'Fast Transfers', desc: 'Limited only by your network speed.' },
-  { icon: '🛡️', title: 'Privacy Focused', desc: 'WebRTC uses DTLS encryption.' },
-  { icon: '📷', title: 'QR Code Pairing', desc: 'Scan and connect instantly.' },
-  { icon: '🔢', title: 'Room Code Pairing', desc: 'Simple 6-digit code to connect.' },
-  { icon: '🪶', title: 'Lightweight', desc: 'Minimal UI, fast loads, no bloat.' },
+  { icon: FiCpu, title: 'Zero Setup', desc: 'Runs directly in your browser. No downloads, installations, or registration required.' },
+  { icon: FiLock, title: 'Privacy First', desc: 'Files never touch a server. Direct WebRTC transfers are secured with peer-to-peer encryption.' },
+  { icon: FiZap, title: 'Fast Direct Transfer', desc: 'Transfer speed is only limited by your local network capability.' },
 ];
 
 export default function Landing() {
@@ -41,15 +26,16 @@ export default function Landing() {
       <nav className="sticky top-0 z-40 border-b border-gray-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xl">🪂</span>
+            <FiShare2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             <span className="font-bold">PeerDrop</span>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg"
+              className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg flex items-center justify-center"
+              aria-label="Toggle theme"
             >
-              {theme === 'dark' ? '☀️' : '🌙'}
+              {theme === 'dark' ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
             </button>
             <button
               onClick={() => navigate('/dashboard')}
@@ -79,7 +65,7 @@ export default function Landing() {
             onClick={() => navigate('/dashboard')}
             className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium"
           >
-            🪂 Start Sharing — It's Free
+            Start Sharing — It's Free
           </button>
           <a
             href="#how-it-works"
@@ -90,27 +76,10 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="bg-gray-50 dark:bg-slate-900 border-y border-gray-200 dark:border-slate-800 py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center mb-2">Everything you need</h2>
-          <p className="text-center text-gray-500 dark:text-gray-400 mb-10">Built with the web platform — no plugins needed</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {features.map(f => (
-              <div key={f.title} className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-5">
-                <div className="text-3xl mb-3">{f.icon}</div>
-                <h3 className="font-semibold mb-1">{f.title}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* How it works */}
-      <section className="py-16 max-w-6xl mx-auto px-4" id="how-it-works">
+      <section className="py-16 max-w-6xl mx-auto px-4 border-t border-gray-100 dark:border-slate-900" id="how-it-works">
         <h2 className="text-2xl font-bold text-center mb-2">How it works</h2>
-        <p className="text-center text-gray-500 dark:text-gray-400 mb-10">Three steps to start sharing</p>
+        <p className="text-center text-gray-500 dark:text-gray-400 mb-10">Three simple steps to start sharing</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map(s => (
             <div key={s.n} className="text-center">
@@ -126,15 +95,20 @@ export default function Landing() {
       <section className="bg-gray-50 dark:bg-slate-900 border-y border-gray-200 dark:border-slate-800 py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-2">Why PeerDrop?</h2>
-          <p className="text-center text-gray-500 dark:text-gray-400 mb-10">10 reasons to choose peer-to-peer</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {advantages.map(a => (
-              <div key={a.title} className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-center">
-                <div className="text-2xl mb-2">{a.icon}</div>
-                <div className="font-semibold text-sm mb-1">{a.title}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">{a.desc}</div>
-              </div>
-            ))}
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-10">Direct, secure, and fast communication</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {advantages.map(a => {
+              const Icon = a.icon;
+              return (
+                <div key={a.title} className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 text-center shadow-sm">
+                  <div className="flex justify-center mb-4">
+                    <Icon className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <h3 className="font-semibold text-base mb-2 text-gray-900 dark:text-white">{a.title}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{a.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -147,14 +121,14 @@ export default function Landing() {
           onClick={() => navigate('/dashboard')}
           className="px-10 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium"
         >
-          🚀 Open PeerDrop App
+          Open PeerDrop App
         </button>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-gray-200 dark:border-slate-800 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <span>🪂</span>
+          <FiShare2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
           <span className="font-semibold text-gray-900 dark:text-white">PeerDrop</span>
         </div>
         <p>No tracking · No ads · Files never leave your browser</p>
